@@ -40,7 +40,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
 
   FurElise _music = new FurElise();
-  WPI_TalonFX _talonFX = new WPI_TalonFX(1, "rio");
+  WPI_TalonFX _talonFX = new WPI_TalonFX(11, "rio");
+  WPI_TalonFX _talonFX2= new WPI_TalonFX(12, "rio");
 
   @Override
   public void teleopPeriodic() {
@@ -53,5 +54,6 @@ public class Robot extends TimedRobot {
 
     /* update the FX. If the freq is 0, no-note is played */
     _talonFX.set(TalonFXControlMode.MusicTone, freq);
+    _talonFX2.set(TalonFXControlMode.MusicTone, freq-20);
   }
 }

@@ -56,7 +56,7 @@ import frc.robot.sim.PhysicsSim;
 
 public class Robot extends TimedRobot {
 	/* Hardware */
-	WPI_TalonFX _talon = new WPI_TalonFX(1, "rio");
+	WPI_TalonFX _talon = new WPI_TalonFX(11, "rio");
     Joystick _joy = new Joystick(0);
     
     /* String for output */
@@ -80,10 +80,9 @@ public class Robot extends TimedRobot {
 		_talon.configNeutralDeadband(0.001);
 
 		/* Config sensor used for Primary PID [Velocity] */
-        _talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-                                            Constants.kPIDLoopIdx, 
-											Constants.kTimeoutMs);
-											
+		_talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
+				Constants.kPIDLoopIdx,
+				Constants.kTimeoutMs);
 
 		/* Config the peak and nominal outputs */
 		_talon.configNominalOutputForward(0, Constants.kTimeoutMs);
@@ -98,10 +97,12 @@ public class Robot extends TimedRobot {
 		_talon.config_kD(Constants.kPIDLoopIdx, Constants.kGains_Velocit.kD, Constants.kTimeoutMs);
 		/*
 		 * Talon FX does not need sensor phase set for its integrated sensor
-		 * This is because it will always be correct if the selected feedback device is integrated sensor (default value)
+		 * This is because it will always be correct if the selected feedback device is
+		 * integrated sensor (default value)
 		 * and the user calls getSelectedSensor* to get the sensor's position/velocity.
 		 * 
-		 * https://phoenix-documentation.readthedocs.io/en/latest/ch14_MCSensor.html#sensor-phase
+		 * https://phoenix-documentation.readthedocs.io/en/latest/ch14_MCSensor.html#
+		 * sensor-phase
 		 */
         // _talon.setSensorPhase(true);
 	}
@@ -112,17 +113,20 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		/* Get gamepad axis */
 		double leftYstick = -1 * _joy.getY();
+		if ((leftYstick>0 && leftYstick<0.05) || (leftYstick<0 && leftYstick>-0.05)){
+			leftYstick=0;
+		}
 
 		/* Get Talon/Victor's current output percentage */
 		double motorOutput = _talon.getMotorOutputPercent();
 		
 		/* Prepare line to print */
-		_sb.append("\tout:");
+		_sb.append("\tmotor output [1-100]:");
 		/* Cast to int to remove decimal places */
 		_sb.append((int) (motorOutput * 100));
 		_sb.append("%");	// Percent
 
-		_sb.append("\tspd:");
+		_sb.append("\tsensor velocity:");
 		_sb.append(_talon.getSelectedSensorVelocity(Constants.kPIDLoopIdx));
 		_sb.append("u"); 	// Native units
 
@@ -143,9 +147,9 @@ public class Robot extends TimedRobot {
 			_talon.set(TalonFXControlMode.Velocity, targetVelocity_UnitsPer100ms);
 
 			/* Append more signals to print when in speed mode. */
-			_sb.append("\terr:");
+			_sb.append("\tclose loop err:");
 			_sb.append(_talon.getClosedLoopError(Constants.kPIDLoopIdx));
-			_sb.append("\ttrg:");
+			_sb.append("\ttarget velocity:");
 			_sb.append(targetVelocity_UnitsPer100ms);
 		} else {
 			/* Percent Output */

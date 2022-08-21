@@ -57,7 +57,7 @@ import frc.robot.sim.PhysicsSim;
 
 public class Robot extends TimedRobot {
     /** Hardware */
-	WPI_TalonFX _talon = new WPI_TalonFX(2, "rio");
+	WPI_TalonFX _talon = new WPI_TalonFX(11, "rio");
 	Joystick _joy = new Joystick(0);
 	
     /** Used to create string thoughout loop */
@@ -157,6 +157,7 @@ public class Robot extends TimedRobot {
 
 			/* 10 Rotations * 2048 u/rev in either direction */
 			targetPositionRotations = leftYstick * 10.0 * 2048;
+			_talon.setSelectedSensorPosition(0);
 			_talon.set(TalonFXControlMode.Position, targetPositionRotations);
 		}
 
@@ -177,6 +178,8 @@ public class Robot extends TimedRobot {
 			_sb.append("\ttrg:");
 			_sb.append(targetPositionRotations);
 			_sb.append("u");	/// Native Units
+		} else if (!button2) {
+			_talon.set(TalonFXControlMode.PercentOutput, 0);
 		}
 
 		/**
