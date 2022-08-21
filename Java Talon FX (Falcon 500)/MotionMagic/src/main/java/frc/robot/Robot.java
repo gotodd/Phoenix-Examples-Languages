@@ -70,7 +70,7 @@ import frc.robot.sim.PhysicsSim;
 
 public class Robot extends TimedRobot {
 	/* Hardware */
-	WPI_TalonFX _talon = new WPI_TalonFX(1, "rio"); // Rename "rio" to match the CANivore device name if using a CANivore
+	WPI_TalonFX _talon = new WPI_TalonFX(11, "rio"); // Rename "rio" to match the CANivore device name if using a CANivore
 	Joystick _joy = new Joystick(0);
 
 	/* Used to build string throughout loop */
@@ -81,6 +81,8 @@ public class Robot extends TimedRobot {
 
 	/** save the last Point Of View / D-pad value */
 	int _pov = -1;
+	
+	int _button1 = 0;
 
 	public void simulationInit() {
 		PhysicsSim.getInstance().addTalonFX(_talon, 0.5, 5100);
@@ -135,8 +137,8 @@ public class Robot extends TimedRobot {
 		_talon.config_kD(Constants.kSlotIdx, Constants.kGains.kD, Constants.kTimeoutMs);
 
 		/* Set acceleration and vcruise velocity - see documentation */
-		_talon.configMotionCruiseVelocity(15000, Constants.kTimeoutMs);
-		_talon.configMotionAcceleration(6000, Constants.kTimeoutMs);
+		_talon.configMotionCruiseVelocity(30000, Constants.kTimeoutMs);
+		_talon.configMotionAcceleration(12000, Constants.kTimeoutMs);
 
 		/* Zero the sensor once on robot boot up */
 		_talon.setSelectedSensorPosition(0, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
@@ -167,10 +169,15 @@ public class Robot extends TimedRobot {
 		 */
 		if (_joy.getRawButton(1)) {
 			/* Motion Magic */
+			double targetPos = 0;
 
-			/* 2048 ticks/rev * 10 Rotations in either direction */
-			double targetPos = rghtYstick * 2048 * 10.0;
-			_talon.set(TalonFXControlMode.MotionMagic, targetPos);
+			if (_button1==0){
+				_button1=1;
+				_talon.setSelectedSensorPosition(0, Constants.kPIDLoopIdx, Constants.kTimeoutMs);
+				/* 2048 ticks/rev * 10 Rotations in either direction */
+				targetPos = rghtYstick * 2048 * 30.0;
+				_talon.set(TalonFXControlMode.MotionMagic, targetPos);
+			}
 
 			/* Append more signals to print when in speed mode */
 			_sb.append("\terr:");
@@ -181,6 +188,7 @@ public class Robot extends TimedRobot {
 			/* Percent Output */
 
 			_talon.set(TalonFXControlMode.PercentOutput, leftYstick);
+			_button1=0;
 		}
 		if (_joy.getRawButton(2)) {
 			/* Zero sensor positions */
